@@ -22,7 +22,14 @@ class QuestionTypeSerializer(serializers.ModelSerializer):
         model = QuestionType
         fields = "__all__"
 
+class QuestionChoiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuestionChoice
+        fields = "__all__"
+
 class QuestionSerializer(serializers.ModelSerializer):
+    "related name use "
+    question=QuestionChoiceSerializer(required=False,many=True)
     class Meta:
         model = Question
         fields = "__all__"
@@ -32,7 +39,3 @@ class AnswersSerializer(serializers.ModelSerializer):
         model = Answers
         fields = "__all__"
 
-class QuestionChoiceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = QuestionChoice
-        fields = "__all__"

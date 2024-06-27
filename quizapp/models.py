@@ -35,7 +35,7 @@ class QuestionType(BaseModel):
         return self.questiontype
     
 
-class Question(models.Model):
+class Question(BaseModel):
     
     quizz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
     content = models.CharField(max_length=255)

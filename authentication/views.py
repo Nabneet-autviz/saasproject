@@ -21,7 +21,9 @@ class CustomApiView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        error_keys = list(serializer.errors.keys()) if isinstance(serializer.errors, dict) else []  
+        error_keys_str = ', '.join(error_keys)
+        return Response({"message":error_keys_str + " is already exists"}, status=status.HTTP_400_BAD_REQUEST)
     
 
 class LoginApiView(APIView):
@@ -33,16 +35,17 @@ class LoginApiView(APIView):
 
         user = authenticate(
             username=username, password=password)
-        
-        refresh = RefreshToken.for_user(user)
-
-        return JsonResponse(
-            {
-               'refresh':str(refresh),
-               'access':str(refresh.access_token),
-               'user_info':CustomUserSerializer(user,many=False).data
-            }
-        )
+        if user:
+            refresh = RefreshToken.for_user(user)
+    
+            return JsonResponse(
+                {
+                'refresh':str(refresh),
+                'access':str(refresh.access_token),
+                'user_info':CustomUserSerializer(user,many=False).data
+                }
+            )
+        return Response({'message':"username or password are incorrect"})
 
 class LogoutApiView(APIView):
     permission_classes = [IsAuthenticated]
