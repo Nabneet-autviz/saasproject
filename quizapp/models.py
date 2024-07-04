@@ -8,19 +8,19 @@ class BaseModel(models.Model):
     class Meta:
         abstract = True
 
-
-class Quiz(BaseModel):
-    quiz_name = models.CharField(max_length=500,default=False)
-    quiz_description  = models.TextField()
-    def __str__(self):
-         return self.quiz_name
-
 class DifficultyRating(BaseModel):
-    difficultyrating = models.CharField(max_length=10)
+    difficultyrating = models.CharField(max_length=100)
 
     def __str__(self):
         return self.difficultyrating
-    
+class Quiz(BaseModel):
+    quiz_name = models.CharField(max_length=500,default=False)
+    quiz_description  = models.TextField()
+    difficultyrating = models.ForeignKey(DifficultyRating, on_delete=models.CASCADE,related_name="difficulity_quiz")
+    def __str__(self):
+         return self.quiz_name
+
+
 class QuestionGroup(BaseModel):
     questiongroup = models.CharField(max_length=100)
 
@@ -37,21 +37,27 @@ class QuestionType(BaseModel):
 
 class Question(BaseModel):
     
-    quizz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    quizz = models.ForeignKey(Quiz, on_delete=models.CASCADE,related_name="quizz_name")
     content = models.CharField(max_length=255)
     difficultyrating = models.ForeignKey(DifficultyRating, on_delete=models.CASCADE,related_name="difficulity_question")
     questiongroup = models.ForeignKey(QuestionGroup, on_delete=models.CASCADE,related_name="group_question")
     questiontype = models.ForeignKey(QuestionType, on_delete=models.CASCADE,related_name="type_question")
     answer = models.CharField(max_length=500)
-    picture = models.FileField(upload_to='media/', blank=True, null=True)
+    
     
 
     def __str__(self):
         return self.content
     
+class Picture(BaseModel):
+    picture = models.FileField(upload_to='media/', blank=True, null=True)
+    question = models.ForeignKey(Question,on_delete=models.CASCADE,related_name="picture_question")
+    def __str__(self):
+        return self.question
+    
 
 class Answers(BaseModel):
-    answer = models.CharField(max_length=255)
+    answer = models.CharField(max_length=5509)
     student= models.ForeignKey(CustomUser,on_delete=models.CASCADE,related_name="user_customer")
     question = models.ForeignKey(Question,on_delete=models.CASCADE,related_name="user_question")
     def __str__(self):

@@ -30,9 +30,22 @@ class QuestionChoiceSerializer(serializers.ModelSerializer):
 class QuestionSerializer(serializers.ModelSerializer):
     "related name use "
     question=QuestionChoiceSerializer(required=False,many=True)
+    
+    quiz_name = serializers.SerializerMethodField()
+    group_name = serializers.SerializerMethodField()
+    difficulty_rating  = serializers.SerializerMethodField()
     class Meta:
         model = Question
         fields = "__all__"
+
+    def get_quiz_name(self,obj):
+        return obj.quizz.quiz_name
+    def get_group_name(self,obj):
+        return obj.questiongroup.questiongroup
+    def get_difficulty_rating(self,obj):
+        return obj.difficultyrating.difficultyrating
+    
+
 
 class AnswersSerializer(serializers.ModelSerializer):
     class Meta:

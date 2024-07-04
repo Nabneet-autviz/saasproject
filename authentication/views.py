@@ -10,6 +10,7 @@ from .models import *
 from .serializers import *
 from rest_framework_simplejwt.authentication import JWTTokenUserAuthentication
 from rest_framework import status, viewsets
+# from quizapp.pagination import *
 
 
 # Create your views here.
@@ -67,5 +68,10 @@ class CustomUserViewset(viewsets.ModelViewSet):
     Permission_classes = [IsAuthenticated]
     queryset = CustomUser.objects.filter(is_staff=False)
     serializer_class = CustomUserSerializer
+    # pagination_class = CustomPagination
 
+from rest_framework_simplejwt.views import TokenRefreshView
+
+class CustomTokenRefreshView(TokenRefreshView):
+    permission_classes = [AllowAny]
 
