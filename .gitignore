@@ -1,2 +1,7 @@
 /saasenv
 /env
+*.pyc
+__pycache__/
+/media/*
+!/media/.gitignore
+.gitignore

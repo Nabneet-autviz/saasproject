@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import *
+from authentication.models import ClassName
 
 class QuizSerializer(serializers.ModelSerializer):
     class Meta:
@@ -10,7 +11,10 @@ class DifficultyRatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = DifficultyRating
         fields = "__all__"
-
+class PictureSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Picture
+        fields = "__all__"
 
 class QuestionGroupSerializer(serializers.ModelSerializer):
     class Meta:
@@ -26,14 +30,20 @@ class QuestionChoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuestionChoice
         fields = "__all__"
+class AnswersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Answers
+        fields = "__all__"
 
 class QuestionSerializer(serializers.ModelSerializer):
     "related name use "
     question=QuestionChoiceSerializer(required=False,many=True)
-    
-    quiz_name = serializers.SerializerMethodField()
+    user_question=AnswersSerializer(required=False,many=True)
+    # quiz_name = serializers.SerializerMethodField()
     group_name = serializers.SerializerMethodField()
     difficulty_rating  = serializers.SerializerMethodField()
+    picture = serializers.SerializerMethodField()
+    
     class Meta:
         model = Question
         fields = "__all__"
@@ -44,11 +54,16 @@ class QuestionSerializer(serializers.ModelSerializer):
         return obj.questiongroup.questiongroup
     def get_difficulty_rating(self,obj):
         return obj.difficultyrating.difficultyrating
-    
-
-
-class AnswersSerializer(serializers.ModelSerializer):
+    def get_picture(self,obj):
+        return PictureSerializer(obj.picture_question.all(),many=True).data
+   
+class UserQuestionAnswerSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Answers
+        model = Question
         fields = "__all__"
 
+
+class ClassNameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ClassName
+        fields = "__all__"

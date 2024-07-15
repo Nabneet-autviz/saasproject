@@ -10,6 +10,7 @@ from .models import *
 from .serializers import *
 from rest_framework_simplejwt.authentication import JWTTokenUserAuthentication
 from rest_framework import status, viewsets
+from django_filters.rest_framework import DjangoFilterBackend
 # from quizapp.pagination import *
 
 
@@ -18,7 +19,7 @@ from rest_framework import status, viewsets
 class CustomApiView(APIView):
     permission_classes = [AllowAny] 
     def post(self,request):
-        serializer = CustomUserSerializer(data=request.data)
+        serializer = CustomUserSignSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -30,7 +31,6 @@ class CustomApiView(APIView):
 class LoginApiView(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
-        print(request.data)
         username = request.data.get('username')
         password = request.data.get('password')
 
@@ -46,14 +46,12 @@ class LoginApiView(APIView):
                 'user_info':CustomUserSerializer(user,many=False).data
                 }
             )
-        return Response({'message':"username or password are incorrect"})
+        return Response({'message':"username or password are incorrect"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class LogoutApiView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTTokenUserAuthentication]
     def post(self, request):
-        print(request.data)
-        
         try:
             refresh_token = request.data["refresh_token"]
             token = RefreshToken(refresh_token)
@@ -65,10 +63,11 @@ class LogoutApiView(APIView):
 
 
 class CustomUserViewset(viewsets.ModelViewSet):
-    Permission_classes = [IsAuthenticated]
+    # Permission_classes = [IsAuthenticated]
     queryset = CustomUser.objects.filter(is_staff=False)
     serializer_class = CustomUserSerializer
-    # pagination_class = CustomPagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["class_name"]
 
 from rest_framework_simplejwt.views import TokenRefreshView
 

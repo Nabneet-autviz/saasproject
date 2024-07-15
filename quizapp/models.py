@@ -1,5 +1,5 @@
 from django.db import models
-from authentication.models import *
+from authentication.models import CustomUser,ClassName
 
 class BaseModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -7,21 +7,25 @@ class BaseModel(models.Model):
 
     class Meta:
         abstract = True
-
+        ordering = ['-created_at']
+    
 class DifficultyRating(BaseModel):
-    difficultyrating = models.CharField(max_length=100)
+    difficultyrating = models.CharField(max_length=100,unique=True)
 
     def __str__(self):
         return self.difficultyrating
+    
 class Quiz(BaseModel):
+    class_name = models.ForeignKey(ClassName, on_delete=models.CASCADE,related_name="quiz_class")
     quiz_name = models.CharField(max_length=500,default=False)
     quiz_description  = models.TextField()
     difficultyrating = models.ForeignKey(DifficultyRating, on_delete=models.CASCADE,related_name="difficulity_quiz")
     def __str__(self):
-         return self.quiz_name
+        return self.quiz_name
 
 
 class QuestionGroup(BaseModel):
+    quizz = models.ForeignKey(Quiz, on_delete=models.CASCADE,related_name="quizz_Qgroup_name")
     questiongroup = models.CharField(max_length=100)
 
     def __str__(self):
@@ -43,17 +47,16 @@ class Question(BaseModel):
     questiongroup = models.ForeignKey(QuestionGroup, on_delete=models.CASCADE,related_name="group_question")
     questiontype = models.ForeignKey(QuestionType, on_delete=models.CASCADE,related_name="type_question")
     answer = models.CharField(max_length=500)
-    
-    
-
+    comment = models.TextField(default=None, blank=True)
     def __str__(self):
         return self.content
     
+
 class Picture(BaseModel):
     picture = models.FileField(upload_to='media/', blank=True, null=True)
     question = models.ForeignKey(Question,on_delete=models.CASCADE,related_name="picture_question")
-    def __str__(self):
-        return self.question
+    # def __str__(self):
+    #     return self.question
     
 
 class Answers(BaseModel):
