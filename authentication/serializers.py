@@ -26,9 +26,10 @@ class CustomUserSignSerializer(serializers.ModelSerializer):
     class Meta:
         model =CustomUser
         fields="__all__"
-        fields = ('id','username', 'password', 'email', 'first_name', 'last_name','created_at','updated_at','class_name')
+        # fields = ('id','username', 'password', 'email', 'first_name', 'last_name','created_at','updated_at','class_name')
 
     def create(self, validated_data):
+        validated_data['is_active'] = True 
         user = CustomUser.objects.create_user(**validated_data)
 
         return user
